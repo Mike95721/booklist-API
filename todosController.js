@@ -17,6 +17,7 @@ exports.create = function (req, res, next) {
 		author: req.body.author,
 		title: req.body.title,
 		read: req.body.read,
+		link: req.body.link,
 	});
 	idno++;
 	res.send({ result: "true" });
@@ -25,6 +26,15 @@ exports.create = function (req, res, next) {
 exports.show = function (req, res, next) {
 	//verifying
 	const bookItem = bookList.find((item) => item.id == req.params.id);
+	if (!bookItem) {
+		return next(createError(404, "no book with that id"));
+	}
+	res.send(bookItem);
+};
+
+exports.showAuthor = function (req, res, next) {
+	//verifying
+	const bookItem = bookList.find((item) => item.author == req.params.author);
 	if (!bookItem) {
 		return next(createError(404, "no book with that id"));
 	}
