@@ -36,7 +36,7 @@ exports.showAuthor = function (req, res, next) {
 	//verifying
 	const bookItem = bookList.find((item) => item.author == req.params.author);
 	if (!bookItem) {
-		return next(createError(404, "no book with that id"));
+		return next(createError(404, "no book with that author!"));
 	}
 	res.send(bookItem);
 };
