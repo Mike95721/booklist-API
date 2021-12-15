@@ -1,78 +1,57 @@
-const req = require("express/lib/request");
 const createError = require("http-errors");
-let bookList = []; //create an empty array
-let idno = 0;
+const ObjectId = require("mongodb").ObjectId;
+const { Books } = require("./models/books");
+//let todoList = []
+//let idno = 0
 
-exports.index = function (req, res) {
-	res.send(bookList);
+exports.index = async function (req, res) {
+	Books.find().then((books) => res.send(books));
 };
 
-exports.create = function (req, res, next) {
-	if (!req.body.author) {
-		return next(createError(400, "name is required"));
+exports.create = async function (req, res, next) {
+	if (!req.body.title) {
+		return next(createError(400, "title of the book is required"));
 	}
 
-	bookList.push({
-		id: idno,
-		author: req.body.author,
+	const book = new Books({
 		title: req.body.title,
+		author: req.body.author,
 		read: req.body.read,
 		link: req.body.link,
 	});
-	idno++;
-	res.send({ result: "true" });
+	book.save().then(() => res.send({ result: true }));
 };
 
-exports.show = function (req, res, next) {
-	//verifying
-	const bookItem = bookList.find((item) => item.id == req.params.id);
-	if (!bookItem) {
-		return next(createError(404, "no book with that id"));
-	}
-	res.send(bookItem);
+exports.show = async function (req, res, next) {
+	Books.findOne({ _id: ObjectId(req.params.id) }).then((bookItem) => {
+		if (!bookItem) {
+			return next(createError(404, "no book with that id"));
+		}
+		res.send(bookItem);
+	});
 };
 
-exports.showAuthor = function (req, res, next) {
-	//verifying
-	const bookItem = bookList.find((item) => item.author == req.params.author);
-	if (!bookItem) {
-		return next(createError(404, "no book with that author!"));
-	}
-	res.send(bookItem);
-};
-
-exports.update = function (req, res, next) {
-	//verifying
-	const bookItem = bookList.find((item) => item.id == req.params.id);
-
-	if (!req.body.author) {
-		return next(createError(400, "author is required"));
-	}
-
-	if (!bookItem) {
-		return next(createError(404, "no book with that id"));
-	}
-	//updating
-	bookList = bookList.map((item) => {
-		if (item.id == req.params.id) {
-			(item.author = req.body.author), (item.title = req.body.title);
+exports.update = async function (req, res, next) {
+	Books.findOne({ _id: ObjectId(req.params.id) }).then((bookItem) => {
+		if (!bookItem) {
+			return next(createError(404, "no book with that id"));
 		}
 
-		return item;
+		bookItem.title = req.body.title;
+		bookItem.author = req.body.author;
+		bookItem.read = req.body.read;
+		bookItem.link = req.body.link;
+		bookItem.save().then(() => res.send({ result: true }));
 	});
-
-	res.send({ result: true });
 };
 
 exports.delete = function (req, res, next) {
-	//verifying
-	const bookItem = bookList.find((item) => item.id == req.params.id);
-
-	if (!bookItem) {
-		return next(createError(404, "no book with that id"));
-	}
-
-	//deleting
-	bookList = bookList.filter((item) => item.id != req.params.id);
-	res.send({ result: true });
+	Books.deleteOne({ _id: ObjectId(req.params.id) })
+		.then((r) => {
+			if (r.deletedCount) {
+				return res.send({ result: true });
+			}
+			return next(createError(404, "no book with that id"));
+		})
+		.catch((err) => console.log(err));
 };
