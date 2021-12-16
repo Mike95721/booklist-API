@@ -31,6 +31,24 @@ exports.show = async function (req, res, next) {
 	});
 };
 
+exports.showAuthor = async function (req, res, next) {
+	Books.find({ author: req.params.author }).then((bookItem) => {
+		if (!bookItem) {
+			return next(createError(404, "no author with that name!"));
+		}
+		res.send(bookItem);
+	});
+};
+
+exports.showTitle = async function (req, res, next) {
+	Books.find({ title: req.params.title }).then((bookItem) => {
+		if (!bookItem) {
+			return next(createError(404, "no title with that name!"));
+		}
+		res.send(bookItem);
+	});
+};
+
 exports.update = async function (req, res, next) {
 	Books.findOne({ _id: ObjectId(req.params.id) }).then((bookItem) => {
 		if (!bookItem) {
