@@ -6,8 +6,7 @@ const mongoose = require("mongoose");
 
 app.use(express.json());
 app.use(router);
-const uri =
-	"mongodb+srv://admin:EL666Mv0HQrqvn32@todolist.b1eae.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+const uri = "mongodb+srv://admin:EL666Mv0HQrqvn32@todolist.b1eae.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
 
 mongoose.connect(uri);
 

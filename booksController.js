@@ -43,7 +43,7 @@ exports.showAuthor = async function (req, res, next) {
 exports.showTitle = async function (req, res, next) {
 	Books.find({ title: req.params.title }).then((bookItem) => {
 		if (!bookItem) {
-			return next(createError(404, "no title with that name!"));
+			return next(createError(404, "no book with that name!"));
 		}
 		res.send(bookItem);
 	});
